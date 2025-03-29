@@ -1,0 +1,22 @@
+# Toggl configuration
+toggl:
+  user: your-toggl-user-id
+  password: your-toggl-password
+  api_url: https://api.track.toggl.com/api/v9
+
+# Jira configuration
+jira:
+  bearer_token: your-jira-bearer-token
+  api_url: https://your-jira-url/rest/api/2
+
+# Time log configuration
+time_log:
+  default_description: "General development work"
+  description_separators: ["||", "//"]
+  ticket_rules:
+    ".*(daily|retro|demo).*": "ABC-123"
+    "bobcat.*deploy.*": "ABC-442"
+    ".*": "INTERNALOT-3251"
+  fillin:
+    ticket: TICKET-123
+    description: "Working on task" 

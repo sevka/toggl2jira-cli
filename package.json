@@ -1,0 +1,15 @@
+{
+  "name": "toggl2jira-cli",
+  "version": "1.0.0",
+  "description": "CLI tool for syncing time logs from Toggl to Jira",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "yaml": "^2.3.4"
+  }
+} 
