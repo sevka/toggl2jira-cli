@@ -50,13 +50,17 @@ async function main() {
 
     // Group entries by date
     const dailyEntries = timeLogProcessor.groupEntriesByDate(processedEntries);
+    
+    // Get sorted dates for consistent ordering
+    const sortedDates = Object.keys(dailyEntries).sort();
 
     // Display entries grouped by day
     console.log('\nTime entries to be synced:');
     console.log('===========================');
     
     let totalHours = 0;
-    for (const [date, entries] of Object.entries(dailyEntries)) {
+    for (const date of sortedDates) {
+      const entries = dailyEntries[date];
       const dayTotal = entries.reduce((sum, entry) => sum + entry.duration, 0);
       totalHours += dayTotal;
       
@@ -72,13 +76,19 @@ async function main() {
 
     // Sync time entries to Jira
     if (options.sync) {
-      console.log('\nSyncing to Jira...');
+      console.log('\nStarting sync to Jira...');
       try {
-        // Create all worklogs in parallel with progress reporting
-        await jiraService.createWorklogsParallel(
-          processedEntries,
-          (entry) => console.log(`✓ Synced: ${entry.ticket}`)
-        );
+        // Process each day
+        for (const date of sortedDates) {
+          console.log(`\nSyncing entries for ${date}...`);
+          
+          // Sync entries for this day
+          await jiraService.syncEntriesByDate(
+            dailyEntries[date],
+            (entry) => console.log(`  ✓ Synced: ${entry.ticket}`)
+          );
+        }
+        
         console.log('\nSuccessfully synced all time entries to Jira!');
       } catch (error) {
         console.error('Error syncing to Jira:', error.message);

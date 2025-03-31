@@ -28,8 +28,7 @@ export class JiraService {
 
       if (!response.ok) {
         const errorBody = await response.text();
-        console.error('Jira API Error Response:', errorBody);
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
       }
 
       // Report progress if callback is provided
@@ -53,6 +52,15 @@ export class JiraService {
     } catch (error) {
       // If any request fails, the entire batch fails
       throw new Error(`Failed to create worklogs in parallel: ${error.message}`);
+    }
+  }
+
+  async syncEntriesByDate(entries, onProgress) {
+    try {
+      // Sync entries in parallel
+      await this.createWorklogsParallel(entries, onProgress);
+    } catch (error) {
+      throw new Error(`Failed to sync entries: ${error.message}`);
     }
   }
 } 
