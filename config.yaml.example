@@ -20,3 +20,6 @@ time_log:
   fillin:
     ticket: TICKET-123
     description: "Working on task" 
+  rounding:
+    step: 0.25  # Round to nearest 0.25 hours (15 minutes)
+    method: round  # Rounding method: 'round' or 'ceil' 

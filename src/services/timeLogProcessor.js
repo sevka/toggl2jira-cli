@@ -2,6 +2,8 @@ export class TimeLogProcessor {
   constructor(config) {
     this.config = config;
     this.ticketRegex = /[A-Z0-9]+-\d+/;
+    this.roundingStep = config.rounding?.step || 0.25;
+    this.roundingMethod = config.rounding?.method || 'round';
   }
 
   processTimeEntries(entries) {
@@ -89,8 +91,27 @@ export class TimeLogProcessor {
   }
 
   roundDuration(duration) {
-    // Round up to nearest 0.25 (15 minutes)
-    return Math.round(duration * 4) / 4;
+    // Calculate the number of steps
+    const steps = duration / this.roundingStep;
+    
+    // Apply the selected rounding method
+    let roundedSteps;
+    switch (this.roundingMethod) {
+      case 'round':
+        roundedSteps = Math.round(steps);
+        break;
+      case 'ceil':
+        roundedSteps = Math.ceil(steps);
+        break;
+      default:
+        roundedSteps = Math.round(steps); // Default to round
+    }
+    
+    // Convert back to hours
+    const rounded = roundedSteps * this.roundingStep;
+    
+    // If rounded value is 0, use step value
+    return rounded === 0 ? this.roundingStep : rounded;
   }
 
   generateFillinEntries(entries, startDate, endDate) {
