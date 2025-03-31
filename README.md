@@ -8,7 +8,7 @@ A CLI tool for syncing time logs from Toggl to Jira.
 - Support for automatic ticket detection from time log descriptions
 - Configurable ticket rules using regular expressions
 - Option to fill in missing time to reach 8 hours per day
-- Time rounding to 15-minute intervals
+- Configurable time rounding with step and method options
 - Dry run mode to preview changes
 
 ## Prerequisites
@@ -93,8 +93,20 @@ time_log:
     ".*": "INTERNALOT-3251"
   fillin:
     ticket: TICKET-123
-    description: "Fillin description" 
+    description: "Fillin description"
+  rounding:
+    step: 0.25  # Round to nearest 0.25 hours (15 minutes)
+    method: round  # Rounding method: 'round' or 'ceil'
 ```
+
+### Rounding Configuration
+
+The `rounding` section in the configuration controls how time entries are rounded:
+
+- `step`: The interval to round to (default: 0.25 hours = 15 minutes)
+- `method`: The rounding method to use:
+  - `round`: Rounds to the nearest step (e.g., 0.3 → 0.25, 0.4 → 0.5)
+  - `ceil`: Rounds up to the next step (e.g., 0.3 → 0.5, 0.4 → 0.5)
 
 ## Time Log Format
 
