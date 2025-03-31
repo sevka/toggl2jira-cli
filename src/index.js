@@ -70,16 +70,22 @@ async function main() {
     console.log('\n===========================');
     console.log(`Grand total: ${totalHours} hours`);
 
-    // Sync to Jira if requested
+    // Sync time entries to Jira
     if (options.sync) {
       console.log('\nSyncing to Jira...');
-      for (const entry of processedEntries) {
-        await jiraService.createWorklog(entry);
-        console.log(`✓ Synced: ${entry.ticket}`);
+      try {
+        // Create all worklogs in parallel with progress reporting
+        await jiraService.createWorklogsParallel(
+          processedEntries,
+          (entry) => console.log(`✓ Synced: ${entry.ticket}`)
+        );
+        console.log('\nSuccessfully synced all time entries to Jira!');
+      } catch (error) {
+        console.error('Error syncing to Jira:', error.message);
+        process.exit(1);
       }
-      console.log('\nSync completed successfully!');
     } else {
-      console.log('\nDry run completed. Use --sync to actually sync the entries.');
+      console.log('\nDry run completed. Use --sync flag to actually sync to Jira.');
     }
   } catch (error) {
     console.error('Error:', error.message);

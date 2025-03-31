@@ -4,7 +4,7 @@ export class JiraService {
     this.baseUrl = config.api_url;
   }
 
-  async createWorklog(entry) {
+  async createWorklog(entry, onProgress) {
     try {
       // Format the date to match the working PHP implementation
       const date = new Date(entry.start);
@@ -15,8 +15,6 @@ export class JiraService {
         comment: entry.description,
         started: jiraDate
       };
-
-      console.log('Sending to Jira:', JSON.stringify(worklogData, null, 2));
 
       const response = await fetch(`${this.baseUrl}/issue/${entry.ticket}/worklog`, {
         method: 'POST',
@@ -33,8 +31,28 @@ export class JiraService {
         console.error('Jira API Error Response:', errorBody);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      // Report progress if callback is provided
+      if (onProgress) {
+        onProgress(entry);
+      }
     } catch (error) {
       throw new Error(`Failed to create worklog in Jira for ticket ${entry.ticket}: ${error.message}`);
+    }
+  }
+
+  async createWorklogsParallel(entries, onProgress) {
+    try {
+      // Create an array of promises for each entry
+      const promises = entries.map(entry => this.createWorklog(entry, onProgress));
+      
+      // Execute all promises in parallel and wait for all to complete
+      const results = await Promise.all(promises);
+      
+      return results;
+    } catch (error) {
+      // If any request fails, the entire batch fails
+      throw new Error(`Failed to create worklogs in parallel: ${error.message}`);
     }
   }
 } 
